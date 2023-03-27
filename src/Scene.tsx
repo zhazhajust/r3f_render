@@ -53,38 +53,3 @@ const Scene = ({ file }: { file: string }) => {
   return obj ? <primitive object={obj} scale={0.05} /> : null;
 };
 
-const App = () => {
-  const [file, setFile] = useState<string | null>(null);
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files.length > 0) {
-      setFile(URL.createObjectURL(event.target.files[0]));
-    }
-  };
-
-  return (
-    <div className="App">
-      <div className="input-container">
-        <input
-          type="file"
-          id="file-input"
-          accept=".obj"
-          onChange={handleFileChange}
-        />
-        <label htmlFor="file-input">Choose an OBJ file</label>
-      </div>
-      {file && (
-        <div className="canvas-container">
-          <Canvas>
-            <Suspense fallback={null}>
-              <Scene file={file} />
-              <OrbitControls />
-            </Suspense>
-          </Canvas>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default App;

@@ -54,11 +54,11 @@ const Scene = ({ file }: { file: string }) => {
 };
 
 const App = () => {
-  const [file, setFile] = useState<string | null>(null);
+  const [files, setFiles] = useState<FileList | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
-      setFile(URL.createObjectURL(event.target.files[0]));
+      setFiles(event.target.files);
     }
   };
 
@@ -70,14 +70,17 @@ const App = () => {
           id="file-input"
           accept=".obj"
           onChange={handleFileChange}
+          multiple
         />
-        <label htmlFor="file-input">Choose an OBJ file</label>
+        <label htmlFor="file-input">Choose OBJ files</label>
       </div>
-      {file && (
+      {files && (
         <div className="canvas-container">
           <Canvas>
             <Suspense fallback={null}>
-              <Scene file={file} />
+              {Array.from(files).map((file) => (
+                <Scene key={file.name} file={URL.createObjectURL(file)} />
+              ))}
               <OrbitControls />
             </Suspense>
           </Canvas>
