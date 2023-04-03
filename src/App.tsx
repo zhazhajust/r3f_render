@@ -16,7 +16,7 @@ const Scene = ({ file }: { file: string }) => {
 
     loader.load(file, (obj) => {
       // Create a material with vertex colors
-      const material = new THREE.MeshBasicMaterial({ vertexColors: true });
+      const material = new THREE.MeshPhysicalMaterial({ vertexColors: true , metalness: 1.0, roughness: 0.3});
 
       // For each child of the loaded object, assign the new material and add vertex colors
       obj.traverse((child) => {
@@ -33,16 +33,27 @@ const Scene = ({ file }: { file: string }) => {
   // Function to add vertex colors to the geometry
   const addVertexColors = (geometry: any) => {
     // Create a new buffer attribute for the vertex colors
-    const colorAttribute = new BufferAttribute(new Float32Array(geometry.attributes.position.count * 3), 3);
+    const colorAttribute = new BufferAttribute(
+      new Float32Array(geometry.attributes.position.count * 3),
+      3
+    );
 
     // For each vertex, get the color from the obj file and assign it to the new color attribute
     for (let i = 0; i < geometry.attributes.position.count; i++) {
-      const vertexColor = geometry.attributes.color.array.slice(i * 3, i * 3 + 3);
-      colorAttribute.setXYZ(i, vertexColor[0], vertexColor[1], vertexColor[2]);
+      const vertexColor = geometry.attributes.color.array.slice(
+        i * 3,
+        i * 3 + 3
+      );
+      colorAttribute.setXYZ(
+        i,
+        vertexColor[0],
+        vertexColor[1],
+        vertexColor[2]
+      );
     }
 
     // Add the new color attribute to the geometry and return it
-    geometry.setAttribute('color', colorAttribute);
+    geometry.setAttribute("color", colorAttribute);
     return geometry;
   };
 
@@ -50,11 +61,17 @@ const Scene = ({ file }: { file: string }) => {
 };
 
 const App = () => {
-  const [file, setFile] = useState<string | null>(null);
+  const [files, setFiles] = useState<string[]>([]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
-      setFile(URL.createObjectURL(event.target.files[0]));
+      //const newFiles = Array.from(event.target.files).map((file) =>
+      //  URL.createObjectURL(file)
+      //);
+
+      const newFiles = Array.from(event.target.files).map((file) => URL.createObjectURL(file));
+      
+      setFiles((prevFiles) => [...prevFiles, ...newFiles]);
     }
   };
 
@@ -65,17 +82,23 @@ const App = () => {
           type="file"
           id="file-input"
           accept=".obj"
+          multiple
           onChange={handleFileChange}
         />
-        <label htmlFor="file-input">Choose an OBJ file</label>
+        <label htmlFor="file-input">Choose OBJ files</label>
       </div>
-      {file && (
+      {files.length > 0 && (
         <div className="canvas-container">
           <Canvas>
-            <Suspense fallback={null}>
-              <Scene file={file} />
-              <OrbitControls />
-            </Suspense>
+            <directionalLight position={[1, 1, 1]}/>
+            <directionalLight position={[-1, -1, -1]}/>
+            <ambientLight intensity={0.3}/>
+            <OrbitControls />
+            {files.map((file, index) => (
+              <Suspense key = {index} fallback={null}>
+                <Scene file={file} />
+              </Suspense>
+            ))}
           </Canvas>
         </div>
       )}
