@@ -16,13 +16,17 @@ const Scene = ({ file }: { file: string }) => {
 
     loader.load(file, (obj) => {
       // Create a material with vertex colors
-      const material = new THREE.MeshPhysicalMaterial({ vertexColors: true , metalness: 1.0, roughness: 0.3});
+      const material = new THREE.MeshPhysicalMaterial({ vertexColors: true,
+                                                        side:THREE.FrontSide, 
+                                                        metalness: 1.0, 
+                                                        roughness: 0.3 });
 
       // For each child of the loaded object, assign the new material and add vertex colors
       obj.traverse((child) => {
         if (child instanceof THREE.Mesh) {
           child.material = material;
           child.geometry = addVertexColors(child.geometry);
+          //child.geometry.computeVertexNormals();
         }
       });
 
@@ -65,12 +69,9 @@ const App = () => {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
-      //const newFiles = Array.from(event.target.files).map((file) =>
-      //  URL.createObjectURL(file)
-      //);
-
-      const newFiles = Array.from(event.target.files).map((file) => URL.createObjectURL(file));
-      
+      const newFiles = Array.from(event.target.files).map((file) =>
+        URL.createObjectURL(file)
+      );
       setFiles((prevFiles) => [...prevFiles, ...newFiles]);
     }
   };
