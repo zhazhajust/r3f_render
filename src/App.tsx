@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { useState, useEffect } from "react";
 import { Canvas, applyProps, useFrame, useLoader, useGraph } from '@react-three/fiber'
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
-import { OrbitControls } from "@react-three/drei";
+import { Loader, OrbitControls } from "@react-three/drei";
 import { Suspense } from "react";
 import { BufferAttribute } from "three";
 
@@ -11,7 +11,7 @@ import "./App.css";
 // Function to add vertex colors to the geometry
 const Scene = ({ file }: { file: string }) => {
     //load the obj file
-    const obj: THREE.Group = useLoader(OBJLoader, file)
+    const obj: THREE.Group = useLoader(OBJLoader, file);
     //create a material with vertex colors
     const material: THREE.MeshPhysicalMaterial = new THREE.MeshPhysicalMaterial({ 
         vertexColors: true,
